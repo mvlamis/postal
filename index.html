@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Postal</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="stickerbookstyle.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="logo"></div>
+    <ul>
+      <li><a href="explore">explore</a></li>
+      <li><a href="friends">friends</a></li>
+      <li><a href="me">me</a></li>
+      <li><a href="search">search</a></li>
+    </ul>
+              <div class="controls">
+                <button id="saveButton">save</button>
+                <button id="loadButton">load</button>
+                <input type="file" id="fileInput" accept=".json">
+              </div>
+    <div class="add-post">+</div>
+  </nav>
+
+  <div class="flex-container">
+    <section class="profile-section">
+      <div class="profile-card">
+        <img src="images/jennifer.jpg" alt="Profile Image">
+        <h2>Jennifer</h2>
+        <p class="bio">You look like the 4th of July. Makes me want a hot dog real bad.</p>
+      </div>
+    </section>
+
+    <section class="posts-section">
+          <div class="sticker-book">
+            <div class="blank-page" id="blankPage"></div>
+            <div class="sticker-selection" id="stickerSelection">
+              <div id="addTextSticker" draggable="true">Add Text Sticker</div>
+            </div>
+          </div>
+          <!-- <div class="controls">
+            <button id="saveButton">Save Sticker Book</button>
+            <button id="loadButton">Load Sticker Book</button>
+            <input type="file" id="fileInput" accept=".json">
+          </div> -->
+    </section>
+  </div>
+
+  <footer>
+    <!-- Optional footer content -->
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

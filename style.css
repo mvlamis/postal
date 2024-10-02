@@ -1,0 +1,96 @@
+:root {
+    --navbar-height: 100px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Instrument Serif', serif;
+    background-image: url('images/woodtexture.jpg');
+    color: #333;
+    overflow: hidden;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #a27b59;
+    /* padding: 1rem; */
+    height: var(--navbar-height);
+    font-size: larger;
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.navbar li {
+    display: inline;
+}
+
+.navbar a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.profile-section {
+    display: flex;
+    flex-grow: 1;
+    /* margin: 2rem; */
+    width: 20%;
+    /* height: 100%; */
+    background: linear-gradient(180deg, rgba(241, 241, 241, 0.5) 0%, rgba(189, 189, 189, 0.5) 100%);
+    backdrop-filter: blur(2px);
+}
+
+.posts-section {
+    display: flex;
+    flex-grow: 2;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    /* margin: 2rem; */
+    width: 80%;
+    height: 100%;
+}
+
+.profile-card {
+    margin: 1rem;
+    width: 100%;
+}
+
+.profile-card img {
+    width: 100%;
+    height: auto;
+}
+
+.bio {
+    font-style: italic;
+}
+
+.post-gallery {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+}
+
+.post img {
+    width: 200px;
+    /* margin: 1rem; */
+    border-radius: 10px;
+}
+
+.flex-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    justify-content: center;
+    /* padding-top: 1rem; */
+    height: calc(100vh - var(--navbar-height));
+}
