@@ -15,17 +15,18 @@ stickerUrls.forEach((url, index) => {
     img.src = url;
     img.classList.add('sticker');
     img.draggable = true;
-    img.id = `sticker-${index}`;
+    img.dataset.type = 'image';
     stickerSelection.appendChild(img);
 
     img.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/plain', e.target.id);
+        e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'image', src: e.target.src }));
     });
 });
 
 // Allow text stickers to be dragged from the selection
+const addTextSticker = document.getElementById('addTextSticker');
 addTextSticker.addEventListener('dragstart', (e) => {
-    e.dataTransfer.setData('text/plain', 'text-sticker');
+    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'text' }));
 });
 
 // Allow drop functionality on the blank page
@@ -36,43 +37,33 @@ blankPage.addEventListener('dragover', (e) => {
 // Create stickers on the blank page when dropped
 blankPage.addEventListener('drop', (e) => {
     e.preventDefault();
-    const stickerId = e.dataTransfer.getData('text');
-
-    if (stickerId === 'text-sticker') {
-        createTextSticker(e.offsetX, e.offsetY);
-    } else {
-        const stickerElement = document.getElementById(stickerId);
-        createImageSticker(stickerElement.src, e.offsetX, e.offsetY);
-    }
+    const data = JSON.parse(e.dataTransfer.getData('text'));
+    createSticker(data.type, data.src, e.offsetX, e.offsetY);
 });
 
-function createTextSticker(x, y) {
-    const textSticker = document.createElement('div');
-    textSticker.classList.add('text-sticker');
-    textSticker.style.left = `${x - 50}px`;
-    textSticker.style.top = `${y - 25}px`;
+function createSticker(type, content, x, y) {
+    const sticker = document.createElement('div');  // Always create a div container
+    sticker.classList.add('placed-sticker');
+    sticker.style.position = 'absolute';
+    sticker.style.left = `${x - 40}px`;
+    sticker.style.top = `${y - 40}px`;
 
-    const textContent = document.createElement('p');
-    textContent.textContent = 'Double click to edit';
-    textSticker.appendChild(textContent);
+    if (type === 'image') {
+        const img = document.createElement('img');
+        img.src = content;
+        img.draggable = false;  // Prevent default dragging for images
+        sticker.appendChild(img);
+    } else {
+        sticker.classList.add('text-sticker');
+        const textContent = document.createElement('p');
+        textContent.textContent = 'Double click to edit';
+        sticker.appendChild(textContent);
+        sticker.addEventListener('dblclick', editTextSticker);
+    }
 
-    addRemoveButton(textSticker);
-    textSticker.addEventListener('mousedown', startDragging);  // Enable dragging
-    textSticker.addEventListener('dblclick', editTextSticker);
-
-    blankPage.appendChild(textSticker);
-}
-
-function createImageSticker(src, x, y) {
-    const newSticker = document.createElement('img');
-    newSticker.src = src;
-    newSticker.classList.add('placed-sticker');
-    newSticker.style.left = `${x - 40}px`;
-    newSticker.style.top = `${y - 40}px`;
-
-    addRemoveButton(newSticker);
-    newSticker.addEventListener('mousedown', startDragging);  // Enable dragging
-    blankPage.appendChild(newSticker);
+    addRemoveButton(sticker);
+    sticker.addEventListener('mousedown', startDragging);
+    blankPage.appendChild(sticker);
 }
 
 function addRemoveButton(sticker) {
@@ -115,7 +106,7 @@ function editTextSticker(e) {
 function startDragging(e) {
     if (e.target.classList.contains('remove-button')) return;
 
-    const sticker = e.target.closest('.placed-sticker, .text-sticker');
+    const sticker = e.target.closest('.placed-sticker');
     let startX = e.clientX - sticker.offsetLeft;
     let startY = e.clientY - sticker.offsetTop;
 
@@ -138,19 +129,12 @@ loadButton.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', loadState);
 
 function saveState() {
-    const placedStickers = Array.from(blankPage.getElementsByClassName('placed-sticker'));
-    const textStickers = Array.from(blankPage.getElementsByClassName('text-sticker'));
+    const stickers = Array.from(blankPage.getElementsByClassName('placed-sticker'));
 
     const state = {
-        imageStickers: placedStickers.map(sticker => ({
-            type: 'image',
-            src: sticker.src,
-            left: sticker.style.left,
-            top: sticker.style.top
-        })),
-        textStickers: textStickers.map(sticker => ({
-            type: 'text',
-            content: sticker.querySelector('p').textContent,
+        stickers: stickers.map(sticker => ({
+            type: sticker.querySelector('img') ? 'image' : 'text',
+            content: sticker.querySelector('img') ? sticker.querySelector('img').src : sticker.querySelector('p').textContent,
             left: sticker.style.left,
             top: sticker.style.top
         }))
@@ -177,29 +161,13 @@ function loadState(event) {
                 const state = JSON.parse(e.target.result);
                 blankPage.innerHTML = ''; // Clear current stickers
 
-                state.imageStickers.forEach(stickerData => {
-                    const sticker = document.createElement('img');
-                    sticker.src = stickerData.src;
-                    sticker.classList.add('placed-sticker');
-                    sticker.style.left = stickerData.left;
-                    sticker.style.top = stickerData.top;
-                    addRemoveButton(sticker);
-                    sticker.addEventListener('mousedown', startDragging);
-                    blankPage.appendChild(sticker);
-                });
-
-                state.textStickers.forEach(stickerData => {
-                    const sticker = document.createElement('div');
-                    sticker.classList.add('text-sticker');
-                    sticker.style.left = stickerData.left;
-                    sticker.style.top = stickerData.top;
-                    const textContent = document.createElement('p');
-                    textContent.textContent = stickerData.content;
-                    sticker.appendChild(textContent);
-                    addRemoveButton(sticker);
-                    sticker.addEventListener('mousedown', startDragging);
-                    sticker.addEventListener('dblclick', editTextSticker);
-                    blankPage.appendChild(sticker);
+                state.stickers.forEach(stickerData => {
+                    createSticker(
+                        stickerData.type,
+                        stickerData.content,
+                        parseInt(stickerData.left),
+                        parseInt(stickerData.top)
+                    );
                 });
 
                 alert('Sticker book loaded successfully!');
