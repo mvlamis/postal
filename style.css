@@ -12,7 +12,7 @@ body {
     font-family: 'Instrument Serif', serif;
     background-image: url('images/woodtexture.jpg');
     color: #333;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .navbar {

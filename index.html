@@ -22,11 +22,11 @@
       <li><a href="me">me</a></li>
       <li><a href="search">search</a></li>
     </ul>
-              <div class="controls">
-                <button id="saveButton">save</button>
-                <button id="loadButton">load</button>
-                <input type="file" id="fileInput" accept=".json">
-              </div>
+    <div class="controls">
+      <button id="saveButton">save</button>
+      <button id="loadButton">load</button>
+      <input type="file" id="fileInput" accept=".json">
+    </div>
     <div class="add-post">+</div>
   </nav>
 
@@ -43,7 +43,12 @@
           <div class="sticker-book">
             <div class="blank-page" id="blankPage"></div>
             <div class="sticker-selection" id="stickerSelection">
-              <div id="addTextSticker" draggable="true">Add Text Sticker</div>
+              <div class="sticker-icons">
+                <img src="icons/Text.png" id="addTextSticker" draggable="true">
+                <img src="icons/Image.png" id="addImageSticker" draggable="true">
+                <img src="icons/Link.png" id="addLinkSticker" draggable="true">
+                <img src="icons/Audio.png" id="addAudioSticker" draggable="true">
+              </div> 
             </div>
           </div>
           <!-- <div class="controls">
@@ -54,11 +59,20 @@
     </section>
   </div>
 
+  <div id="editStickerModal">
+    <button id="closeEditStickerModal">X</button>
+    <div class="editImageSticker">
+      <input type="text" id="editImageStickerURL" placeholder="Image URL">
+      <input type="text" id="editImageStickerAlt" placeholder="Image Alt Text">
+      <button id="saveEditButton">Save</button>
+    </div>
+  </div>
+
   <footer>
     <!-- Optional footer content -->
   </footer>
 
-  <script src="script.js"></script>
+  <script src="me.js"></script>
 </body>
 
 </html>

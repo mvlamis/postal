@@ -29,6 +29,24 @@ addTextSticker.addEventListener('dragstart', (e) => {
     e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'text' }));
 });
 
+// Allow image stickers to be dragged from the selection
+const addImageSticker = document.getElementById('addImageSticker');
+addImageSticker.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'image', src: 'https://placehold.co/80' }));
+});
+
+// Allow link stickers to be dragged from the selection
+const addLinkSticker = document.getElementById('addLinkSticker');
+addLinkSticker.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'link', src: 'https://www.google.com' }));
+});
+
+// Allow audio stickers to be dragged from the selection
+const addAudioSticker = document.getElementById('addAudioSticker');
+addAudioSticker.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'audio', src: '' }));
+});
+
 // Allow drop functionality on the blank page
 blankPage.addEventListener('dragover', (e) => {
     e.preventDefault();
@@ -38,7 +56,13 @@ blankPage.addEventListener('dragover', (e) => {
 blankPage.addEventListener('drop', (e) => {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData('text'));
-    createSticker(data.type, data.src, e.offsetX, e.offsetY);
+    // if sticker is not link
+    if (data.type !== 'link') {
+        createSticker(data.type, data.src, e.offsetX, e.offsetY);
+    } else if (data.type === 'link') {
+        // show modal to get link
+        showEditStickerModal(e);
+    }
 });
 
 function createSticker(type, content, x, y) {
@@ -52,8 +76,20 @@ function createSticker(type, content, x, y) {
         const img = document.createElement('img');
         img.src = content;
         img.draggable = false;  // Prevent default dragging for images
+        sticker.addEventListener('dblclick', showEditStickerModal);
         sticker.appendChild(img);
-    } else {
+    } if (type === 'link') {
+        const link = document.createElement('a');
+        link.href = content;
+        link.target = '_blank';
+        link.textContent = 'Click to open link';
+        sticker.appendChild(link);
+    } if (type === 'audio') {
+        const audio = document.createElement('audio');
+        audio.src = content;
+        audio.controls = true;
+        sticker.appendChild(audio);
+    } else if (type === 'text') {
         sticker.classList.add('text-sticker');
         const textContent = document.createElement('p');
         textContent.textContent = 'Double click to edit';
@@ -64,6 +100,50 @@ function createSticker(type, content, x, y) {
     addRemoveButton(sticker);
     sticker.addEventListener('mousedown', startDragging);
     blankPage.appendChild(sticker);
+}
+
+function showEditStickerModal(e) {
+    const sticker = e.target.closest('.placed-sticker');
+    console.log(sticker);
+
+    const modal = document.getElementById('editStickerModal');
+    modal.style.display = 'block';
+    modal.querySelector('button').addEventListener('click', () => modal.style.display = 'none'); 
+    
+    // Image sticker
+    if (sticker.querySelector('img')) {
+        const editImageStickerURL = document.getElementById('editImageStickerURL');
+        const editImageStickerAlt = document.getElementById('editImageStickerAlt');
+        editImageStickerURL.value = sticker.querySelector('img').src;
+        editImageStickerAlt.value = sticker.querySelector('img').alt;
+        
+        const saveEditButton = document.getElementById('saveEditButton');
+        saveEditButton.addEventListener('click', () => {
+            const editImageStickerURL = document.getElementById('editImageStickerURL');
+            const editImageStickerAlt = document.getElementById('editImageStickerAlt');
+            // save the changes
+            sticker.querySelector('img').src = editImageStickerURL.value;
+            sticker.querySelector('img').alt = editImageStickerAlt.value;
+            // close the modal
+            modal.style.display = 'none';
+        });
+    }
+    // Link sticker
+    if (sticker.querySelector('a')) {
+        const editLinkStickerURL = document.getElementById('editLinkStickerURL');
+        editLinkStickerURL.value = sticker.querySelector('a').href;
+        
+        const saveEditButton = document.getElementById('saveEditButton');
+        saveEditButton.addEventListener('click', () => {
+            const editLinkStickerURL = document.getElementById('editLinkStickerURL');
+            // save the changes
+            sticker.querySelector('a').href = editLinkStickerURL.value;
+            // close the modal
+            modal.style.display = 'none';
+        });
+    }
+    
+    
 }
 
 function addRemoveButton(sticker) {
@@ -78,6 +158,7 @@ function addRemoveButton(sticker) {
 }
 
 function editTextSticker(e) {
+    console.log(e);
     const textSticker = e.target.closest('.text-sticker');
     const textContent = textSticker.querySelector('p');
     const input = document.createElement('textarea');
@@ -129,6 +210,7 @@ loadButton.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', loadState);
 
 function saveState() {
+    const userID = '1';  // Replace with actual user ID
     const stickers = Array.from(blankPage.getElementsByClassName('placed-sticker'));
 
     const state = {
